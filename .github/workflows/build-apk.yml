@@ -27,7 +27,7 @@ jobs:
 
       - name: Build APK
         run: |
-          flet build apk main.py
+          flet build apk --module-name main
 
       - name: Get changelog for release body
         run: |
