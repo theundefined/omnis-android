@@ -1,3 +1,12 @@
+## [0.1.9] - 2025-12-23
+
+### 🐛 Bug Fixes
+
+- *(ci)* Explicitly specify entry point for Flet build
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.1.9
 ## [0.1.8] - 2025-12-23
 
 ### 🐛 Bug Fixes
