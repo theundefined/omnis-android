@@ -1,3 +1,12 @@
+## [0.1.8] - 2025-12-23
+
+### 🐛 Bug Fixes
+
+- *(ci)* Include refactored modules in Flet build
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.1.8
 ## [0.1.7] - 2025-12-23
 
 ### 🚜 Refactor
