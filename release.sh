@@ -43,7 +43,7 @@ fi
 echo "Bumping version to $NEW_VERSION"
 
 # Generate changelog for the new version
-git-cliff --tag "$NEW_VERSION" --prepend ./CHANGELOG.md
+git-cliff --tag "$NEW_VERSION" --prepend CHANGELOG.md
 git add CHANGELOG.md
 git commit -m "chore(release): update changelog for $NEW_VERSION"
 
