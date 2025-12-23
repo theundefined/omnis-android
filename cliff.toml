@@ -21,8 +21,9 @@ body = """
     {% for commit in commits | sort(attribute="scope") %}
         - {% if commit.scope %}(**{{ commit.scope }}**){% endif %} {{ commit.message | upper_first }} ([`{{ commit.id | truncate(length=7, end="") }}`]({{ commit.id }}))
     {% endfor %}
-{% endfor %}\n
-"""
+{% endfor %}
+
+"
 # remove the leading and trailing whitespaces from the template
 trim = true
 # changelog footer
@@ -46,7 +47,7 @@ commit_parsers = [
     { message = "^refactor", group = "Refactor" },
     { message = "^style", group = "Styling" },
     { message = "^test", group = "Testing" },
-    { message = "^chore\\(release\\):", skip = true },
+    { message = "^chore\(release\):", skip = true },
     { message = "^chore", group = "Miscellaneous Tasks" },
 ]
 # protect breaking changes from being skipped due to matching a skipping commit_parser
@@ -61,4 +62,3 @@ skip_tags = "v0.1.0-beta.1"
 topo_order = false
 # sort the commits inside sections by oldest/newest
 sort_commits = "newest"
-
