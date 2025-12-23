@@ -1,0 +1,43 @@
+name: Build Android APK
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install flet
+          pip install -r requirements.txt
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build APK
+        run: |
+          flet build apk \
+            --project "Moje Biblioteki" \
+            --version ${{ steps.get_version.outputs.VERSION }} \
+            --build-name "Moje Biblioteki ${{ steps.get_version.outputs.VERSION }}" \
+            --description "Nieoficjalny klient bibliotek OMNIS." \
+            --author "TheUndefined" \
+            --app-name "Moje Biblioteki"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: moje-biblioteki-apk
+          path: build/apk/moje-biblioteki.apk
