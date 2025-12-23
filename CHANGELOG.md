@@ -1,3 +1,13 @@
+## [0.1.7] - 2025-12-23
+
+### 🚜 Refactor
+
+- Extensive application restructuring and stability fixes
+
+### ⚙️ Miscellaneous Tasks
+
+- Untrack __pycache__ files
+- *(release)* Update changelog for v0.1.7
 ## [0.1.6] - 2025-12-23
 
 ### 🐛 Bug Fixes
