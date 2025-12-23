@@ -27,7 +27,7 @@ jobs:
 
       - name: Build APK
         run: |
-          flet build apk --include app_state.py --include views
+          flet build apk main.py
 
       - name: Get changelog for release body
         run: |
