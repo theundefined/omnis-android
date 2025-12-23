@@ -30,17 +30,22 @@ jobs:
           flet build apk
 
       - name: Get changelog for release body
+        run: |
+          # This step will just create a placeholder file to extract the body for the release.
+          # The real changelog generation happens locally in release.sh.
+          # Here we just need the body for the GitHub Release.
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "## Release Notes for $LATEST_TAG" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Full changelog available in CHANGELOG.md" >> release_notes.md
+          echo "content=$(cat release_notes.md)" >> $GITHUB_OUTPUT
         id: get_changelog
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --latest --strip all
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: build/apk/*.apk
-          body: ${{ steps.get_changelog.outputs.content }}
+          body_path: "release_notes.md" # We use the generated notes
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -44,6 +44,8 @@ echo "Bumping version to $NEW_VERSION"
 
 # Generate changelog for the new version
 git-cliff --tag "$NEW_VERSION" --latest --prepend CHANGELOG.md
+
+# Commit the changelog
 git add CHANGELOG.md
 git commit -m "chore(release): update changelog for $NEW_VERSION"
 
