@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK & Create Release
 
 on:
   push:
@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create a release
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,16 +25,22 @@ jobs:
           pip install flet
           pip install -r requirements.txt
 
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Build APK
         run: |
           flet build apk
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - name: Get changelog for release body
+        id: get_changelog
+        uses: orhun/git-cliff-action@v3
         with:
-          name: moje-biblioteki-apk
-          path: build/apk/*.apk
+          config: cliff.toml
+          args: --latest --strip all
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/apk/*.apk
+          body: ${{ steps.get_changelog.outputs.content }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
