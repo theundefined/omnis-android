@@ -29,11 +29,11 @@ jobs:
       - name: Build APK
         run: |
           flet build apk \
-            --project "moje-biblioteki" \
+            --app-name "Moje Biblioteki" \
             --description "Nieoficjalny klient bibliotek OMNIS."
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: moje-biblioteki-apk
-          path: build/apk/moje-biblioteki.apk
+          path: build/apk/app-release.apk
