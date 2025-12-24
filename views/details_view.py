@@ -1,34 +1,80 @@
 import flet as ft
+from app_state import mask_text, format_date
+from datetime import datetime, timedelta
+
+
+def get_time_ago(dt: datetime) -> str:
+    """Returns a human-readable string of how long ago a datetime was."""
+    now = datetime.now()
+    diff = now - dt
+
+    if diff < timedelta(minutes=1):
+        return "przed chwilą"
+    elif diff < timedelta(hours=1):
+        minutes = int(diff.total_seconds() / 60)
+        return f"{minutes} min temu"
+    elif diff < timedelta(days=1):
+        hours = int(diff.total_seconds() / 3600)
+        return f"{hours} godz. temu"
+    else:
+        days = diff.days
+        return f"{days} dni temu"
+
+
+import flet as ft
 import asyncio
-from app_state import Account, mask_text, format_date
-from omnis.client import OmnisClient
-from omnis.tenants import KNOWN_TENANTS
+from app_state import mask_text, format_date
+from datetime import datetime, timedelta
 
-async def get_client_for_account(account: Account):
-    tenant = KNOWN_TENANTS[account.tenant_index]
-    client = OmnisClient(base_url=tenant["base_url"])
-    await client.login(
-        username=account.username,
-        password=account.password,
-        institution=tenant["institution"],
-        view=tenant["view"]
-    )
-    return client
+def get_time_ago(dt: datetime) -> str:
+    """Returns a human-readable string of how long ago a datetime was."""
+    now = datetime.now()
+    diff = now - dt
+    
+    if diff < timedelta(minutes=1):
+        return "przed chwilą"
+    elif diff < timedelta(hours=1):
+        minutes = int(diff.total_seconds() / 60)
+        return f"{minutes} min temu"
+    elif diff < timedelta(days=1):
+        hours = int(diff.total_seconds() / 3600)
+        return f"{hours} godz. temu"
+    else:
+        days = diff.days
+        return f"{days} dni temu"
 
-async def build_account_details_view(index, page, am, app_state, navigate_to, show_snack):
+async def build_account_details_view(
+    index, page, am, app_state, navigate_to, show_snack, get_data_for_account, log_debug
+):
     acc = am.accounts[index]
+    log_debug(page, f"Building details view for account '{acc.name}' (index: {index})")
+    
     content_area = ft.Column(
         controls=[ft.ProgressRing()],
         alignment=ft.MainAxisAlignment.CENTER,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        expand=True
+        expand=True,
     )
 
-    async def fetch_details():
-        try:
-            client = await get_client_for_account(acc)
-            details = await client.get_personal_settings()
+    async def load_and_populate():
+        log_debug(page, "Details view: starting data fetch.")
+        cached_data = await get_data_for_account(acc)
+        log_debug(page, f"Details view: data fetch complete. Data is {'present' if cached_data else 'missing'}.")
 
+        content_area.controls.clear()
+
+        if not cached_data or not cached_data.personal_settings:
+            content_area.controls.append(
+                ft.Text("Nie udało się pobrać szczegółowych danych konta.", color=ft.Colors.RED)
+            )
+            log_debug(page, "Details view: personal_settings missing, showing error.")
+            page.update()
+            return
+
+        try:
+            details = cached_data.personal_settings
+            
+            # --- Parsing Logic ---
             full_name, email, phone, pesel, expiry, addr1, addr2 = "---", "---", "---", "---", "---", "---", ""
             
             user_details_from_api = details.get("user_details", {})
@@ -75,7 +121,7 @@ async def build_account_details_view(index, page, am, app_state, navigate_to, sh
                     if isinstance(insts, list) and insts:
                         expiry = format_date(insts[0].get("patronexpirydate", ""))
             
-            content_area.controls.clear()
+            # --- Display Logic ---
             content_area.controls.extend([
                 ft.ListTile(leading=ft.Icon(ft.Icons.PERSON), title=ft.Text("Pełna nazwa"), subtitle=ft.Text(full_name)),
                 ft.ListTile(leading=ft.Icon(ft.Icons.FINGERPRINT), title=ft.Text("PESEL"), subtitle=ft.Text(mask_text(pesel, 2, 2))),
@@ -83,22 +129,32 @@ async def build_account_details_view(index, page, am, app_state, navigate_to, sh
                 ft.ListTile(leading=ft.Icon(ft.Icons.PHONE), title=ft.Text("Telefon"), subtitle=ft.Text(mask_text(phone, 3, 2))),
                 ft.ListTile(leading=ft.Icon(ft.Icons.HOME), title=ft.Text("Adres"), subtitle=ft.Text(f"{addr1}\n{addr2}".strip())),
                 ft.ListTile(leading=ft.Icon(ft.Icons.EVENT_AVAILABLE), title=ft.Text("Konto ważne do"), subtitle=ft.Text(expiry)),
+                ft.Divider(height=10),
+                ft.Text(f"Dane z: {get_time_ago(cached_data.last_updated)}", italic=True, color=ft.Colors.BLUE_GREY_400, text_align=ft.TextAlign.CENTER),
             ])
+            log_debug(page, "Details view: Populated controls with data.")
         except Exception as e:
-            content_area.controls.clear()
-            content_area.controls.append(ft.Text(f"Błąd pobierania danych: {e}", color=ft.Colors.RED))
+            error_msg = f"Błąd przetwarzania danych: {e}"
+            content_area.controls.append(ft.Text(error_msg, color=ft.Colors.RED))
+            log_debug(page, f"Details view: Exception during processing: {error_msg}")
+
+        log_debug(page, "Details view: Calling page.update().")
         page.update()
 
-    page.run_task(fetch_details)
-
-    return ft.View(
+    # --- View construction ---
+    view = ft.View(
         f"/details/{index}",
         [
             ft.AppBar(
-                leading=ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: navigate_to(f"/edit/{index}")),
+                leading=ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: navigate_to("/")),
                 title=ft.Text(f"Dane osobowe: {acc.name}"),
-                bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
+                bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             ),
-            ft.Container(content=content_area, padding=20, expand=True)
-        ]
+            ft.Container(content=content_area, padding=20, expand=True),
+        ],
     )
+
+    asyncio.create_task(load_and_populate())
+    log_debug(page, "Details view: Created background task to load and populate.")
+
+    return view
