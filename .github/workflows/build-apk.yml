@@ -27,7 +27,7 @@ jobs:
 
       - name: Build APK
         run: |
-          flet build apk --module-name main
+          flet build apk --module-name main --flutter-build-args "-Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.internal.http.socketTimeout=120000"
 
       - name: Get changelog for release body
         run: |
