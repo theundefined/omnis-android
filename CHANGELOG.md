@@ -1,3 +1,12 @@
+## [0.1.12] - 2025-12-24
+
+### 🐛 Bug Fixes
+
+- *(ci)* Increase Gradle network timeouts
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.1.12
 ## [0.1.11] - 2025-12-24
 
 ### 🚀 Features
