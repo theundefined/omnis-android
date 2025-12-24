@@ -1,3 +1,12 @@
+## [0.1.10] - 2025-12-23
+
+### 🐛 Bug Fixes
+
+- *(ci)* Use --module-name to specify build entry point
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.1.10
 ## [0.1.9] - 2025-12-23
 
 ### 🐛 Bug Fixes
