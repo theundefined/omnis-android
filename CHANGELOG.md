@@ -1,3 +1,12 @@
+## [0.1.11] - 2025-12-24
+
+### 🚀 Features
+
+- Implement persistent caching and fix UI bugs
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.1.11
 ## [0.1.10] - 2025-12-23
 
 ### 🐛 Bug Fixes
