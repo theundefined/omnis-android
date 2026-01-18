@@ -1,3 +1,12 @@
+## [0.2.5] - 2026-01-18
+
+### 🚜 Refactor
+
+- *(ci)* Switch to native apksigner and jarsigner for android builds
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.2.5
 ## [0.2.4] - 2026-01-18
 
 ### 🐛 Bug Fixes
