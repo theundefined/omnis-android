@@ -3,13 +3,11 @@ import asyncio
 from datetime import datetime, timedelta
 
 # Import Account model for type hinting
-from app_state import Account, app_state
 
 
 async def build_home_view(
     page, am, app_state, navigate_to, show_snack, get_data_for_account, log_debug
 ):
-
     # --- Local State for this View ---
     _dashboard_data = {}  # Dict to hold {account_idx: CachedData}
     loading_ring = ft.ProgressRing(visible=False, width=20, height=20, stroke_width=2)

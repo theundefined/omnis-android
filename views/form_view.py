@@ -6,7 +6,9 @@ from omnis.client import OmnisClient
 from omnis.tenants import KNOWN_TENANTS
 
 
-async def build_account_form_view(index, page, am, app_state, navigate_to, show_snack, log_debug):
+async def build_account_form_view(
+    index, page, am, app_state, navigate_to, show_snack, log_debug
+):
     is_edit = index is not None
     acc = am.accounts[index] if is_edit else None
 
@@ -46,7 +48,7 @@ async def build_account_form_view(index, page, am, app_state, navigate_to, show_
             # Inline the logic from get_client_for_account
             tenant_idx = int(tenant_dropdown.value)
             tenant = KNOWN_TENANTS[tenant_idx]
-            
+
             client = OmnisClient(base_url=tenant["base_url"])
             await client.login(
                 username=user_input.value,
@@ -79,7 +81,7 @@ async def build_account_form_view(index, page, am, app_state, navigate_to, show_
                 cache_path = get_account_cache_path(acc_to_clear.name)
                 if os.path.exists(cache_path):
                     os.remove(cache_path)
-            
+
             navigate_to("/")
         except Exception as ex:
             log_debug(page, f"Error during save: {ex}")
