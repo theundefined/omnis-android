@@ -1,0 +1,85 @@
+name: Build Android Release (APK & AAB)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create a release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install flet
+          pip install -r requirements.txt
+
+      # --- APK SECTION ---
+      - name: Build APK
+        run: |
+          yes | flet build apk --module-name main
+
+      - name: Sign APK
+        id: sign_apk
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: build/apk
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        # Outputs signed APK path to ${{ steps.sign_apk.outputs.signedReleaseFile }}
+
+      # --- AAB SECTION ---
+      - name: Build AAB
+        run: |
+          yes | flet build aab --module-name main
+
+      - name: Sign AAB
+        id: sign_aab
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: build/aab
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        # Outputs signed AAB path to ${{ steps.sign_aab.outputs.signedReleaseFile }}
+
+      # --- RELEASE SECTION ---
+      - name: Get changelog for release body
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "## Release Notes for $LATEST_TAG" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Full changelog available in CHANGELOG.md" >> release_notes.md
+        id: get_changelog
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Upload both signed files
+          files: |
+            ${{ steps.sign_apk.outputs.signedReleaseFile }}
+            ${{ steps.sign_aab.outputs.signedReleaseFile }}
+          body_path: "release_notes.md"
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
