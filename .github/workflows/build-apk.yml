@@ -15,6 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.1' # Flet works well with this or newer
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -35,18 +46,13 @@ jobs:
           echo "## Release Notes for $LATEST_TAG" > release_notes.md
           echo "" >> release_notes.md
           echo "Full changelog available in CHANGELOG.md" >> release_notes.md
-          {
-            echo 'content<<EOF'
-            cat release_notes.md
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
         id: get_changelog
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: build/apk/*.apk
-          body_path: "release_notes.md" # We use the generated notes
+          body_path: "release_notes.md"
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
