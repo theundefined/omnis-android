@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to create a release
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -56,8 +56,16 @@ jobs:
           
           echo "Using Build Tools: $BUILD_TOOLS_VERSION"
           
+          # Debug: List files to ensure we know the name
+          echo "Files in build/apk:"
+          ls -R build/apk/
+          
+          # Find the APK file (it might be app-release.apk or similar)
+          APK_FILE=$(find build/apk -name "*.apk" | head -n 1)
+          echo "Found APK: $APK_FILE"
+          
           # Align the APK (Optimization)
-          $ANDROID_ZIPALIGN -v -p 4 build/apk/app-release-unsigned.apk build/apk/app-release-aligned.apk
+          $ANDROID_ZIPALIGN -v -p 4 "$APK_FILE" build/apk/app-release-aligned.apk
           
           # Sign the APK
           $ANDROID_APKSIGNER sign \
@@ -79,15 +87,23 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
+          # Debug: List files
+          echo "Files in build/aab:"
+          ls -R build/aab/
+          
+          # Find the AAB file
+          AAB_FILE=$(find build/aab -name "*.aab" | head -n 1)
+          echo "Found AAB: $AAB_FILE"
+          
           # Sign the AAB using jarsigner (standard for AAB)
           jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
             -keystore release-key.jks \
             -storepass "$ANDROID_STORE_PASSWORD" \
             -keypass "$ANDROID_KEY_PASSWORD" \
-            build/aab/app-release.aab "$ANDROID_KEY_ALIAS"
+            "$AAB_FILE" "$ANDROID_KEY_ALIAS"
             
-          # Rename for consistency
-          mv build/aab/app-release.aab build/aab/app-release-signed.aab
+          # Rename/Move for consistency if needed, or just use the signed file directly
+          mv "$AAB_FILE" build/aab/app-release-signed.aab
 
       # --- RELEASE SECTION ---
       - name: Get changelog for release body
