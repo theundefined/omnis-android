@@ -21,11 +21,6 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.1' # Flet works well with this or newer
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -38,7 +33,8 @@ jobs:
 
       - name: Build APK
         run: |
-          flet build apk --module-name main
+          # Use 'yes' to automatically accept Flutter SDK installation by Flet CLI
+          yes | flet build apk --module-name main
 
       - name: Get changelog for release body
         run: |
