@@ -1,3 +1,12 @@
+## [0.2.2] - 2026-01-18
+
+### 🐛 Bug Fixes
+
+- *(ci)* Use yes to accept Flutter installation during build
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.2.2
 ## [0.2.1] - 2026-01-18
 
 ### 🐛 Bug Fixes
