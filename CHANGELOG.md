@@ -1,3 +1,12 @@
+## [0.1.13] - 2025-12-24
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.1.13
+
+### ◀️ Revert
+
+- *(ci)* Remove invalid Gradle arguments from build step
 ## [0.1.12] - 2025-12-24
 
 ### 🐛 Bug Fixes
