@@ -1,4 +1,13 @@
 venv/
 __pycache__/
 build/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+.env
 
+# Local storage and cache
+storage/
+assets/cache/
+gh_run_log.txt
