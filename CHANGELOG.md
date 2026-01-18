@@ -1,3 +1,16 @@
+## [0.2.0] - 2026-01-18
+
+### 🚀 Features
+
+- Add book details enrichment and cover images support
+
+### 🎨 Styling
+
+- Format code with ruff
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.2.0
 ## [0.1.13] - 2025-12-24
 
 ### ⚙️ Miscellaneous Tasks
