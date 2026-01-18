@@ -1,3 +1,12 @@
+## [0.2.4] - 2026-01-18
+
+### 🐛 Bug Fixes
+
+- *(ci)* Update buildToolsVersion to 34.0.0
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.2.4
 ## [0.2.3] - 2026-01-18
 
 ### 🚀 Features
