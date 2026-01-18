@@ -1,3 +1,12 @@
+## [0.2.1] - 2026-01-18
+
+### 🐛 Bug Fixes
+
+- *(ci)* Add Flutter and Java setup to build workflow
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.2.1
 ## [0.2.0] - 2026-01-18
 
 ### 🚀 Features
