@@ -1,3 +1,12 @@
+## [0.2.6] - 2026-01-18
+
+### 🐛 Bug Fixes
+
+- *(ci)* Dynamically find apk and aab files for signing
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Update changelog for v0.2.6
 ## [0.2.5] - 2026-01-18
 
 ### 🚜 Refactor
