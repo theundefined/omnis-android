@@ -35,13 +35,49 @@ async def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
     page.primary_color = ft.Colors.BLUE_700
 
-    # --- Create Cache Directories ---
-    os.makedirs("assets/cache/images", exist_ok=True)
+    # --- Initial Loading Screen ---
+    status_text = ft.Text(
+        "Inicjalizacja aplikacji...", size=16, color=ft.Colors.GREY_700
+    )
+    page.add(
+        ft.Container(
+            content=ft.Column(
+                [
+                    ft.ProgressRing(),
+                    ft.Container(height=20),
+                    status_text,
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+            alignment=ft.alignment.center,
+            expand=True,
+        )
+    )
+    page.update()
 
+    # --- Create Cache Directories ---
+    try:
+        status_text.value = "Sprawdzanie katalogów..."
+        page.update()
+        os.makedirs("assets/cache/images", exist_ok=True)
+    except Exception as e:
+        log_debug(page, f"Error creating directories: {e}")
+
+    # --- Load Accounts ---
     am = AccountManager(page)
-    await am.load_accounts()
-    if not app_state.visible_accounts:
-        app_state.visible_accounts = set(range(len(am.accounts)))
+    try:
+        status_text.value = "Wczytywanie kont..."
+        page.update()
+        await am.load_accounts()
+        if not app_state.visible_accounts:
+            app_state.visible_accounts = set(range(len(am.accounts)))
+    except Exception as e:
+        status_text.value = f"Błąd wczytywania kont: {e}"
+        status_text.color = ft.Colors.RED
+        log_debug(page, f"Error loading accounts: {e}")
+        page.update()
+        await asyncio.sleep(2)  # Give user time to read error
 
     async def download_and_cache_image(client: OmnisClient, cover_url: str, mmsid: str):
         """
